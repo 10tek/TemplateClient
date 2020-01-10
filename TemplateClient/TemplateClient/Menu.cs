@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using TemplateClient.Domain;
 
 namespace TemplateClient
 {
     public class Menu
     {
-        private const string GET = "GET";
-        private const string ADD = "ADD";
-        private const string UPDATE = "UPDATE";
-        private const string REMOVE = "REMOVE";
         private const string IP_ADDRESS = "10.1.4.41";
+        private const string MENU_RETURN = "Нажмите ENTER что бы вернуться в главное меню...";
         private const int PORT = 3231;
+        private RequestService<User> requestService = new RequestService<User>(); 
 
         public void ShowMenu()
         {
@@ -51,19 +50,28 @@ namespace TemplateClient
 
             }
         }
-        public Request<T> Get<T>(NetworkStream stream, string nickname)
+
+        public async void Get<T>(NetworkStream stream)
         {
-            return = new Request<T>
+            Console.Clear();
+            Console.Write("Введите никнейм для поиска: ");
+            var nickname = Console.ReadLine();
+            var response = await requestService.GetAsync(stream, nickname);
+            if(response.Data is null)
             {
-                Action = GET,
-                Path = "/user/",
-                Data = nickname
-            };
+                Console.WriteLine("Таких пользователей не существует.");
+                Console.WriteLine(MENU_RETURN);
+                Console.ReadLine();
+                return;
+            }
+            Console.WriteLine($"Фамилия: {response.Data.LastName}.");
+            Console.WriteLine($"    Имя: {response.Data.FirstName}.");
+            Console.WriteLine($"Никнейм: {response.Data.Nickname}.");
         }
 
-        private void Add(NetworkStream stream)
+        private async void Add(NetworkStream stream)
         {
-
+            Console.Clear();
         }
 
         private void Update(NetworkStream stream)
